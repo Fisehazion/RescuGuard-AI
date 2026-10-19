@@ -1,23 +1,4 @@
 
-# project folder structure
-```text
-accident-severity/
-├── README.md              
-├── .gitignore
-├── data/
-│   ├── raw/
-│   │   └── US_Accidents_March23.csv
-│   └── processed/
-├── backend/
-└── frontend/
-
-```
-
----
-
-### Complete Production `README.md` Content
-
-Create a file named `README.md` in your project root and paste the following content:
 
 ```markdown
 # RescuGuard AI — Road Traffic Accident Severity Predictor & Emergency Response Engine
@@ -27,7 +8,7 @@ Create a file named `README.md` in your project root and paste the following con
 
 ---
 
-## 📌 Project Overview
+## Project Overview
 
 **RescuGuard AI** is a production-grade MVP that leverages Machine Learning and modern web APIs to predict road accident severity (Levels 1–4) in real time. Rather than operating purely as an offline analytical model, it acts as an intelligent decision-support layer for emergency command centers by automatically transforming incident parameters (location, weather, visibility, road geometry) into actionable emergency dispatch protocols.
 
@@ -39,7 +20,7 @@ Create a file named `README.md` in your project root and paste the following con
 
 ---
 
-## 🇪🇹 Strategic Vision & Relevance to Ethiopia
+##  Strategic Vision & Relevance to Ethiopia
 
 Traffic incidents along major freight arteries (such as the **Addis Ababa–Djibouti Logistics Corridor**) and dense urban routes in **Addis Ababa** cause severe emergency delays and loss of life during the critical "Golden Hour."
 
