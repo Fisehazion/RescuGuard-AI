@@ -3,115 +3,294 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emergency Traffic Response System</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>RescuGuard AI — Emergency Response Prioritization</title>
+    <meta name="description" content="INSA Cyber Talent 2026 - Traffic Accident Severity Prediction and Emergency Resource Allocation">
+    
+    <!-- Modern Enterprise Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Leaflet Interactive Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    
+    <link rel="stylesheet" href="css/styles.css?v=2.2">
 </head>
 <body>
-    <div class="app-container">
-        <header class="app-header">
-            <div class="logo"> <span>RescuGuard AI</span></div>
-            <p>Accident Severity Prediction & Dispatch Prioritization Engine</p>
+    <div class="app-layout">
+        <!-- Minimal Enterprise Header -->
+        <header class="app-nav">
+            <div class="nav-brand">
+                <div class="brand-title">RescuGuard <span>AI</span></div>
+                <div class="brand-divider"></div>
+                <div class="brand-subtitle">Traffic Incident Severity & Dispatch Engine</div>
+            </div>
+            <div class="nav-meta">
+                <div class="status-indicator">
+                    <span class="status-dot"></span>
+                    <span id="systemStatus">Online</span>
+                </div>
+                <div class="meta-tag mono" id="telemetryLatency">-- ms</div>
+                <div class="meta-tag">INSA 2026</div>
+            </div>
         </header>
 
-        <main class="dashboard-grid">
-            <!-- Form Section -->
-            <section class="card form-card">
-                <h2>Incident Parameters</h2>
-                <form id="accidentForm">
-                    <div class="form-section-title">📍 Spatial Coordinates</div>
-                    <div class="grid-2">
-                        <div class="input-group">
-                            <label>Start Lat</label>
-                            <input type="number" step="0.0001" id="start_lat" value="39.8651" required>
+        <!-- Presets Row -->
+        <div class="preset-strip">
+            <span class="preset-label">Preset Scenarios:</span>
+            <div class="preset-group">
+                <button type="button" class="preset-btn active" data-preset="addis_gotera">Gotera Interchange</button>
+                <button type="button" class="preset-btn" data-preset="modjo_corridor">Modjo Freight Corridor</button>
+                <button type="button" class="preset-btn" data-preset="bole_rain">Bole Ring Road (Rain)</button>
+                <button type="button" class="preset-btn" data-preset="entoto_fog">Entoto Pass (Fog)</button>
+                <button type="button" class="preset-btn" data-preset="us_benchmark">Highway Benchmark (US)</button>
+            </div>
+        </div>
+
+        <!-- Main Workspace Grid -->
+        <main class="grid-workspace">
+            <!-- Left Column: Input Parameters -->
+            <section class="panel">
+                <div class="panel-header">
+                    <h2>Incident Parameters</h2>
+                    <span class="active-sector" id="activeSectorLabel">Addis Ababa: Gotera Interchange</span>
+                </div>
+
+                <form id="accidentForm" novalidate>
+                    <!-- Map Module -->
+                    <div class="map-section">
+                        <div class="map-toolbar">
+                            <span class="section-tag">Geospatial Locator (OSM)</span>
+                            <div class="map-actions">
+                                <button type="button" id="toggleHeatmapBtn" class="toggle-pill active">Heatmap: On</button>
+                                <button type="button" id="toggleCorridorsBtn" class="toggle-pill active">Corridors: On</button>
+                                <button type="button" id="toggleMapTileBtn" class="toggle-pill">Tile: Dark</button>
+                                <button type="button" id="recenterMapBtn" class="toggle-pill">Recenter</button>
+                            </div>
                         </div>
-                        <div class="input-group">
-                            <label>Start Lng</label>
-                            <input type="number" step="0.0001" id="start_lng" value="-84.0587" required>
+
+                        <div class="map-frame">
+                            <div id="incidentMap"></div>
+                            <div class="map-overlay-info">
+                                <span>Accident Density:</span>
+                                <span class="density-scale">
+                                    <span class="dot d-low"></span> Low
+                                    <span class="dot d-mid"></span> Mod
+                                    <span class="dot d-high"></span> Critical
+                                </span>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="form-section-title">🌤️ Atmospheric Conditions</div>
-                    <div class="grid-3">
-                        <div class="input-group">
-                            <label>Temp (°F)</label>
-                            <input type="number" step="0.1" id="temp_f" value="36.9" required>
+                    <!-- Coordinates -->
+                    <div class="field-row cols-2">
+                        <div class="field-unit">
+                            <label for="start_lat">Latitude</label>
+                            <input type="number" step="0.0001" id="start_lat" value="8.9897" required>
                         </div>
-                        <div class="input-group">
-                            <label>Humidity (%)</label>
-                            <input type="number" step="1" id="humidity" value="91" required>
-                        </div>
-                        <div class="input-group">
-                            <label>Visibility (mi)</label>
-                            <input type="number" step="0.1" id="visibility" value="10.0" required>
+                        <div class="field-unit">
+                            <label for="start_lng">Longitude</label>
+                            <input type="number" step="0.0001" id="start_lng" value="38.7523" required>
                         </div>
                     </div>
 
-                    <div class="form-section-title">🛣️ Environment & Road Features</div>
-                    <div class="grid-2">
-                        <div class="input-group">
-                            <label>Weather Condition</label>
+                    <!-- Atmospheric Conditions -->
+                    <div class="section-tag">Atmospheric Conditions</div>
+                    <div class="field-row cols-3">
+                        <div class="field-unit">
+                            <label for="temp_f">Temperature (°F)</label>
+                            <input type="number" step="0.1" id="temp_f" value="66.0" required>
+                        </div>
+                        <div class="field-unit">
+                            <label for="humidity">Humidity (%)</label>
+                            <input type="number" step="1" min="0" max="100" id="humidity" value="68" required>
+                        </div>
+                        <div class="field-unit">
+                            <label for="visibility">Visibility (mi)</label>
+                            <input type="number" step="0.1" min="0" id="visibility" value="9.0" required>
+                        </div>
+                    </div>
+
+                    <!-- Environment & Time -->
+                    <div class="field-row cols-2">
+                        <div class="field-unit">
+                            <label for="weather_condition">Weather Condition</label>
                             <select id="weather_condition">
                                 <option value="Clear">Clear / Fair</option>
                                 <option value="Rain">Rain / Drizzle</option>
-                                <option value="Fog">Fog / Haze</option>
-                                <option value="Snow">Snow / Ice</option>
+                                <option value="Heavy Rain">Heavy Rain</option>
+                                <option value="Fog">Fog / Mist</option>
+                                <option value="Haze">Haze</option>
                                 <option value="Thunderstorm">Thunderstorm</option>
+                                <option value="Snow">Snow / Freezing</option>
                             </select>
                         </div>
-                        <div class="input-group">
-                            <label>Time of Day</label>
+                        <div class="field-unit">
+                            <label for="sunrise_sunset">Lighting Window</label>
                             <select id="sunrise_sunset">
-                                <option value="Day">Day</option>
+                                <option value="Day">Daylight</option>
                                 <option value="Night">Night</option>
                             </select>
                         </div>
                     </div>
 
-                    <div class="checkbox-group">
-                        <label><input type="checkbox" id="bump"> Speed Bump</label>
-                        <label><input type="checkbox" id="crossing" checked> Pedestrian Crossing</label>
-                        <label><input type="checkbox" id="traffic_signal" checked> Traffic Signal</label>
+                    <!-- Road Features -->
+                    <div class="section-tag">Road Infrastructure</div>
+                    <div class="checkbox-row">
+                        <label class="check-box-label">
+                            <input type="checkbox" id="bump">
+                            <span>Speed Bump</span>
+                        </label>
+                        <label class="check-box-label">
+                            <input type="checkbox" id="crossing" checked>
+                            <span>Pedestrian Crossing</span>
+                        </label>
+                        <label class="check-box-label">
+                            <input type="checkbox" id="traffic_signal" checked>
+                            <span>Traffic Signal</span>
+                        </label>
                     </div>
 
-                    <button type="submit" id="submitBtn" class="btn-primary">Predict Severity & Dispatch Strategy</button>
+                    <button type="submit" id="submitBtn" class="action-submit">
+                        Run Severity Assessment
+                    </button>
                 </form>
             </section>
 
-            <!-- Output Section -->
-            <section class="card output-card">
-                <h2>Emergency Response Dispatch</h2>
-                
-                <div id="placeholder" class="placeholder-state">
-                    <div class="pulse-icon">📡</div>
-                    <p>Provide accident incident parameters to generate real-time dispatch priority.</p>
+            <!-- Right Column: Dispatch Output -->
+            <section class="panel">
+                <div class="panel-header">
+                    <h2>Dispatch Assessment</h2>
+                    <span class="active-sector">Decision Support Output</span>
                 </div>
 
-                <div id="resultContent" class="result-container hidden">
-                    <div id="priorityBanner" class="priority-banner">
-                        <span id="priorityBadge" class="badge">CRITICAL</span>
-                        <h3 id="severityTitle">Critical Highway Emergency</h3>
+                <!-- Empty State -->
+                <div id="placeholder" class="empty-state">
+                    <p class="empty-title">Ready for Assessment</p>
+                    <p class="empty-desc">Select a preset or click on the map to evaluate accident severity and generate dispatch protocols.</p>
+                </div>
+
+                <!-- Results Output -->
+                <div id="resultContent" class="output-body hidden">
+                    <!-- Priority Banner -->
+                    <div id="priorityBanner" class="triage-banner">
+                        <div class="banner-top">
+                            <span id="priorityBadge" class="priority-tag">CRITICAL</span>
+                            <span id="inferenceLatencyPill" class="mono latency-text">-- ms</span>
+                        </div>
+                        <div id="severityTitle" class="severity-heading">Severity Level</div>
+                        <div id="protocolText" class="protocol-desc">Operational Protocol</div>
                     </div>
 
-                    <div class="output-block">
-                        <h4>Protocol Guidance</h4>
-                        <p id="protocolText" class="protocol-text">Mass Casualty Response Protocol</p>
+                    <!-- Risk Factors (XAI) -->
+                    <div class="result-block">
+                        <div class="block-heading">Risk Factor Attribution (XAI)</div>
+                        <div id="riskFactorsContainer" class="risk-tags-container"></div>
                     </div>
 
-                    <div class="output-block">
-                        <h4>Recommended Dispatch Actions</h4>
-                        <ul id="dispatchList" class="dispatch-list"></ul>
+                    <!-- Dispatch Instructions -->
+                    <div class="result-block">
+                        <div class="block-heading">Mandatory Dispatch Actions</div>
+                        <ul id="dispatchList" class="action-list"></ul>
                     </div>
 
-                    <div class="output-block">
-                        <h4>Class Probabilities</h4>
-                        <div id="probabilityBars" class="prob-bars"></div>
+                    <!-- Probability Bars -->
+                    <div class="result-block">
+                        <div class="block-heading">Class Probabilities</div>
+                        <div id="probabilityBars" class="bars-container"></div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="ticket-action-bar">
+                        <button type="button" id="openTicketBtn" class="btn-ticket">
+                            Generate Dispatch Ticket
+                        </button>
                     </div>
                 </div>
             </section>
         </main>
+
+        <!-- Minimal Footer -->
+        <footer class="app-foot">
+            <span>RescuGuard AI — INSA Cyber Talent 2026</span>
+            <span class="foot-sep">•</span>
+            <span>AASTU</span>
+            <span class="foot-sep">•</span>
+            <span>Emergency Operations Decision Support</span>
+        </footer>
     </div>
 
-    <script src="js/app.js"></script>
+    <!-- Official Incident Dispatch Ticket Modal -->
+    <div id="ticketModal" class="modal-backdrop hidden">
+        <div class="modal-box">
+            <div class="modal-top">
+                <div>
+                    <div class="modal-tag">INSA DISPATCH COMMAND</div>
+                    <h3>Incident Dispatch Record</h3>
+                </div>
+                <button type="button" id="closeTicketBtn" class="btn-close">&times;</button>
+            </div>
+            
+            <div class="modal-content" id="ticketPrintArea">
+                <div class="meta-grid">
+                    <div>
+                        <span class="meta-label">Reference</span>
+                        <span id="ticketRefCode" class="meta-value mono">--</span>
+                    </div>
+                    <div>
+                        <span class="meta-label">Timestamp</span>
+                        <span id="ticketTimestamp" class="meta-value mono">--</span>
+                    </div>
+                    <div>
+                        <span class="meta-label">Priority Code</span>
+                        <span id="ticketPriorityVal" class="meta-value">--</span>
+                    </div>
+                </div>
+
+                <div class="ticket-line"></div>
+
+                <div class="ticket-row">
+                    <span class="meta-label">Location</span>
+                    <span id="ticketCoordsVal" class="meta-value mono">--</span>
+                </div>
+
+                <div class="ticket-row">
+                    <span class="meta-label">Protocol</span>
+                    <span id="ticketProtocolVal" class="meta-value">--</span>
+                </div>
+
+                <div class="ticket-row">
+                    <span class="meta-label">Dispatched Units</span>
+                    <ul id="ticketUnitsVal" class="ticket-units-list"></ul>
+                </div>
+
+                <div class="ticket-row">
+                    <span class="meta-label">Identified Hazards</span>
+                    <ul id="ticketRisksVal" class="ticket-risks-list"></ul>
+                </div>
+
+                <div class="sign-grid">
+                    <div>
+                        <div class="sign-line"></div>
+                        <span class="sign-label">Dispatch Officer</span>
+                    </div>
+                    <div>
+                        <div class="sign-line"></div>
+                        <span class="sign-label">Unit Commander</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-bottom">
+                <button type="button" id="printTicketBtn" class="btn-print">Print Record</button>
+                <button type="button" id="dismissTicketBtn" class="btn-dismiss">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+    <script src="js/app.js?v=2.2"></script>
 </body>
 </html>
