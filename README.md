@@ -182,7 +182,3 @@ uvicorn app.main:app --reload --port 8000
 * **Frontend:** Vanilla HTML5, CSS3 (CSS Variables & Grid), Modern JavaScript (ES6 Async/Fetch)
 * **Deployment & Server:** Uvicorn, StaticFiles
 * **Developed by:** Fisehatsion Adisu from AASTU
-
-```
-
-```
