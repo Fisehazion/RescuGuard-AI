@@ -1,8 +1,8 @@
-The `README.md` file should be placed at the **root directory** of your project folder (e.g., inside `accident-severity/` alongside `.gitignore`, `backend/`, `frontend/`, and `data/`).
 
+# project folder structure
 ```text
 accident-severity/
-├── README.md               <-- Place it here in the project root
+├── README.md              
 ├── .gitignore
 ├── data/
 │   ├── raw/
