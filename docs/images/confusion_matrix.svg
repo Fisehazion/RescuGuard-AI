@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 750 620" width="100%" height="100%">
+    <defs>
+        <linearGradient id="bgGradCm" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#0f172a"/>
+            <stop offset="100%" stop-color="#020617"/>
+        </linearGradient>
+    </defs>
+    <rect width="750" height="620" fill="url(#bgGradCm)" rx="12"/>
+
+    <!-- Header -->
+    <text x="375.0" y="36" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="20" font-weight="700" text-anchor="middle">Normalized Holdout Confusion Matrix (US Accidents Real Holdout)</text>
+    <text x="375.0" y="58" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="13" text-anchor="middle">Predicted vs Ground Truth Severity Tiers (Balanced Random Forest)</text>
+
+    <!-- Axis Group Titles -->
+    <text x="380.0" y="88" fill="#38bdf8" font-family="system-ui, sans-serif" font-size="14" font-weight="700" text-anchor="middle">PREDICTED SEVERITY TIER</text>
+    <text x="36" y="330.0" fill="#38bdf8" font-family="system-ui, sans-serif" font-size="14" font-weight="700" text-anchor="middle" transform="rotate(-90 36 330.0)">GROUND TRUTH SEVERITY</text>
+
+    <!-- Cells & Labels -->
+    
+            <rect x="160" y="110" width="106" height="106" rx="6" fill="rgba(14, 165, 233, 0.12)" stroke="#334155" stroke-width="1.5"/>
+            <text x="213.0" y="159.0" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="18" font-weight="700" text-anchor="middle">12.5%</text>
+            <text x="213.0" y="181.0" fill="#94a3b8" fill-opacity="0.8" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">n=1</text>
+            
+            <rect x="270" y="110" width="106" height="106" rx="6" fill="rgba(244, 63, 94, 0.09)" stroke="#334155" stroke-width="1.5"/>
+            <text x="323.0" y="159.0" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="18" font-weight="700" text-anchor="middle">12.5%</text>
+            <text x="323.0" y="181.0" fill="#94a3b8" fill-opacity="0.8" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">n=1</text>
+            
+            <rect x="380" y="110" width="106" height="106" rx="6" fill="rgba(244, 63, 94, 0.47)" stroke="#334155" stroke-width="1.5"/>
+            <text x="433.0" y="159.0" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="18" font-weight="700" text-anchor="middle">62.5%</text>
+            <text x="433.0" y="181.0" fill="#f8fafc" fill-opacity="0.8" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">n=5</text>
+            
+            <rect x="490" y="110" width="106" height="106" rx="6" fill="rgba(244, 63, 94, 0.09)" stroke="#334155" stroke-width="1.5"/>
+            <text x="543.0" y="159.0" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="18" font-weight="700" text-anchor="middle">12.5%</text>
+            <text x="543.0" y="181.0" fill="#94a3b8" fill-opacity="0.8" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">n=1</text>
+            
+            <rect x="160" y="220" width="106" height="106" rx="6" fill="rgba(244, 63, 94, 0.09)" stroke="#334155" stroke-width="1.5"/>
+            <text x="213.0" y="269.0" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="18" font-weight="700" text-anchor="middle">3.0%</text>
+            <text x="213.0" y="291.0" fill="#94a3b8" fill-opacity="0.8" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">n=133</text>
+            
+            <rect x="270" y="220" width="106" height="106" rx="6" fill="rgba(14, 165, 233, 0.32)" stroke="#334155" stroke-width="1.5"/>
+            <text x="323.0" y="269.0" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="18" font-weight="700" text-anchor="middle">31.9%</text>
+            <text x="323.0" y="291.0" fill="#94a3b8" fill-opacity="0.8" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">n=1,395</text>
+            
+            <rect x="380" y="220" width="106" height="106" rx="6" fill="rgba(244, 63, 94, 0.48)" stroke="#334155" stroke-width="1.5"/>
+            <text x="433.0" y="269.0" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="18" font-weight="700" text-anchor="middle">64.3%</text>
+            <text x="433.0" y="291.0" fill="#f8fafc" fill-opacity="0.8" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">n=2,815</text>
+            
+            <rect x="490" y="220" width="106" height="106" rx="6" fill="rgba(244, 63, 94, 0.09)" stroke="#334155" stroke-width="1.5"/>
+            <text x="543.0" y="269.0" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="18" font-weight="700" text-anchor="middle">0.8%</text>
+            <text x="543.0" y="291.0" fill="#94a3b8" fill-opacity="0.8" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">n=33</text>
+            
+            <rect x="160" y="330" width="106" height="106" rx="6" fill="rgba(244, 63, 94, 0.09)" stroke="#334155" stroke-width="1.5"/>
+            <text x="213.0" y="379.0" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="18" font-weight="700" text-anchor="middle">2.3%</text>
+            <text x="213.0" y="401.0" fill="#94a3b8" fill-opacity="0.8" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">n=71</text>
+            
+            <rect x="270" y="330" width="106" height="106" rx="6" fill="rgba(244, 63, 94, 0.09)" stroke="#334155" stroke-width="1.5"/>
+            <text x="323.0" y="379.0" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="18" font-weight="700" text-anchor="middle">8.4%</text>
+            <text x="323.0" y="401.0" fill="#94a3b8" fill-opacity="0.8" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">n=262</text>
+            
+            <rect x="380" y="330" width="106" height="106" rx="6" fill="rgba(14, 165, 233, 0.89)" stroke="#334155" stroke-width="1.5"/>
+            <text x="433.0" y="379.0" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="18" font-weight="700" text-anchor="middle">88.5%</text>
+            <text x="433.0" y="401.0" fill="#f8fafc" fill-opacity="0.8" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">n=2,756</text>
+            
+            <rect x="490" y="330" width="106" height="106" rx="6" fill="rgba(244, 63, 94, 0.09)" stroke="#334155" stroke-width="1.5"/>
+            <text x="543.0" y="379.0" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="18" font-weight="700" text-anchor="middle">0.8%</text>
+            <text x="543.0" y="401.0" fill="#94a3b8" fill-opacity="0.8" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">n=25</text>
+            
+            <rect x="160" y="440" width="106" height="106" rx="6" fill="rgba(244, 63, 94, 0.09)" stroke="#334155" stroke-width="1.5"/>
+            <text x="213.0" y="489.0" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="18" font-weight="700" text-anchor="middle">0.0%</text>
+            <text x="213.0" y="511.0" fill="#94a3b8" fill-opacity="0.8" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">n=0</text>
+            
+            <rect x="270" y="440" width="106" height="106" rx="6" fill="rgba(244, 63, 94, 0.38)" stroke="#334155" stroke-width="1.5"/>
+            <text x="323.0" y="489.0" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="18" font-weight="700" text-anchor="middle">50.0%</text>
+            <text x="323.0" y="511.0" fill="#f8fafc" fill-opacity="0.8" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">n=1</text>
+            
+            <rect x="380" y="440" width="106" height="106" rx="6" fill="rgba(244, 63, 94, 0.38)" stroke="#334155" stroke-width="1.5"/>
+            <text x="433.0" y="489.0" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="18" font-weight="700" text-anchor="middle">50.0%</text>
+            <text x="433.0" y="511.0" fill="#f8fafc" fill-opacity="0.8" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">n=1</text>
+            
+            <rect x="490" y="440" width="106" height="106" rx="6" fill="rgba(14, 165, 233, 0.12)" stroke="#334155" stroke-width="1.5"/>
+            <text x="543.0" y="489.0" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="18" font-weight="700" text-anchor="middle">0.0%</text>
+            <text x="543.0" y="511.0" fill="#94a3b8" fill-opacity="0.8" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">n=0</text>
+            
+    <text x="144" y="169.0" fill="#e2e8f0" font-family="system-ui, sans-serif" font-size="13" font-weight="600" text-anchor="end">Severity 1</text><text x="215.0" y="96" fill="#e2e8f0" font-family="system-ui, sans-serif" font-size="13" font-weight="600" text-anchor="middle">Severity 1</text><text x="144" y="279.0" fill="#e2e8f0" font-family="system-ui, sans-serif" font-size="13" font-weight="600" text-anchor="end">Severity 2</text><text x="325.0" y="96" fill="#e2e8f0" font-family="system-ui, sans-serif" font-size="13" font-weight="600" text-anchor="middle">Severity 2</text><text x="144" y="389.0" fill="#e2e8f0" font-family="system-ui, sans-serif" font-size="13" font-weight="600" text-anchor="end">Severity 3</text><text x="435.0" y="96" fill="#e2e8f0" font-family="system-ui, sans-serif" font-size="13" font-weight="600" text-anchor="middle">Severity 3</text><text x="144" y="499.0" fill="#e2e8f0" font-family="system-ui, sans-serif" font-size="13" font-weight="600" text-anchor="end">Severity 4</text><text x="545.0" y="96" fill="#e2e8f0" font-family="system-ui, sans-serif" font-size="13" font-weight="600" text-anchor="middle">Severity 4</text>
+
+    <!-- Footnote -->
+    <text x="375.0" y="596" fill="#64748b" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">Diagonal cells represent true positive recall across severity tiers 1 to 4.</text>
+</svg>

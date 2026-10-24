@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: rescuguard-ai
+    env: python
+    buildCommand: "pip install -r backend/requirements.txt"
+    startCommand: "cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.8
+      - key: PROJECT_NAME
+        value: "RescuGuard AI — Emergency Response Prioritization"
+    autoDeploy: true

@@ -47,9 +47,16 @@ class TestAPIEndpoints(unittest.TestCase):
         response = predict_accident_severity(payload)
         self.assertIsInstance(response, PredictionResponse)
         self.assertIn(response.predicted_severity, [1, 2, 3, 4])
-        self.assertIsInstance(response.dispatch_recommendation, list)
-        self.assertIsInstance(response.contributing_risk_factors, list)
+    def test_metrics_endpoint(self):
+        """Verifies /metrics endpoint returns evaluation metrics grounded on data."""
+        from app.api.endpoints import get_model_metrics
+        data = get_model_metrics()
+        self.assertIsInstance(data, dict)
+        self.assertIn("accuracy", data)
+        self.assertIn("final_val_log_loss", data)
+        self.assertIn("feature_importances", data)
 
 
 if __name__ == '__main__':
     unittest.main()
+

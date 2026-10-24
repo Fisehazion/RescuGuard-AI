@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 480" width="100%" height="100%">
+    <defs>
+        <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#0f172a"/>
+            <stop offset="100%" stop-color="#020617"/>
+        </linearGradient>
+    </defs>
+    <rect width="900" height="480" fill="url(#bgGrad)" rx="12"/>
+    <rect x="80" y="70" width="770" height="340" fill="#1e293b" fill-opacity="0.4" rx="6" stroke="#334155" stroke-width="1.5"/>
+    
+    <!-- Title and Subtitle -->
+    <text x="450.0" y="36" fill="#f8fafc" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="700" text-anchor="middle">Multi-Class Cross-Entropy Loss Convergence (Log-Loss vs Estimators)</text>
+    <text x="450.0" y="56" fill="#94a3b8" font-family="system-ui, -apple-system, sans-serif" font-size="13" text-anchor="middle">Evaluated on US Accidents Dataset (data/raw/US_Accidents_March23.csv) — Balanced Ensemble</text>
+
+    <!-- Grid -->
+    <line x1="80" y1="410.0" x2="850" y2="410.0" stroke="#334155" stroke-dasharray="4,4" stroke-width="1"/><text x="68" y="414.0" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="12" text-anchor="end">0.803</text><line x1="80" y1="325.0" x2="850" y2="325.0" stroke="#334155" stroke-dasharray="4,4" stroke-width="1"/><text x="68" y="329.0" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="12" text-anchor="end">1.079</text><line x1="80" y1="240.0" x2="850" y2="240.0" stroke="#334155" stroke-dasharray="4,4" stroke-width="1"/><text x="68" y="244.0" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="12" text-anchor="end">1.355</text><line x1="80" y1="155.0" x2="850" y2="155.0" stroke="#334155" stroke-dasharray="4,4" stroke-width="1"/><text x="68" y="159.0" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="12" text-anchor="end">1.631</text><line x1="80" y1="70.0" x2="850" y2="70.0" stroke="#334155" stroke-dasharray="4,4" stroke-width="1"/><text x="68" y="74.0" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="12" text-anchor="end">1.907</text><line x1="80.0" y1="70" x2="80.0" y2="410" stroke="#334155" stroke-dasharray="4,4" stroke-width="1"/><text x="80.0" y="432" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">1</text><line x1="227.8" y1="70" x2="227.8" y2="410" stroke="#334155" stroke-dasharray="4,4" stroke-width="1"/><text x="227.8" y="432" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">20</text><line x1="383.3" y1="70" x2="383.3" y2="410" stroke="#334155" stroke-dasharray="4,4" stroke-width="1"/><text x="383.3" y="432" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">40</text><line x1="538.9" y1="70" x2="538.9" y2="410" stroke="#334155" stroke-dasharray="4,4" stroke-width="1"/><text x="538.9" y="432" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">60</text><line x1="694.4" y1="70" x2="694.4" y2="410" stroke="#334155" stroke-dasharray="4,4" stroke-width="1"/><text x="694.4" y="432" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">80</text><line x1="850.0" y1="70" x2="850.0" y2="410" stroke="#334155" stroke-dasharray="4,4" stroke-width="1"/><text x="850.0" y="432" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">100</text>
+
+    <!-- Axes Labels -->
+    <text x="465.0" y="462" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="13" font-weight="600" text-anchor="middle">Ensemble Complexity (Number of Decision Trees / Estimators)</text>
+    <text x="26" y="240.0" fill="#cbd5e1" font-family="system-ui, sans-serif" font-size="13" font-weight="600" text-anchor="middle" transform="rotate(-90 26 240.0)">Multi-Class Cross-Entropy (Log-Loss)</text>
+
+    <!-- Lines -->
+    <polyline fill="none" stroke="#38bdf8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="80.0,98.0 111.1,367.5 150.0,372.7 227.8,377.6 344.4,378.7 461.1,381.8 655.6,382.5 850.0,381.7"/>
+    <polyline fill="none" stroke="#f43f5e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="80.0,119.9 111.1,366.0 150.0,370.9 227.8,376.5 344.4,377.7 461.1,380.7 655.6,381.7 850.0,380.8"/>
+
+    <!-- End value callouts -->
+    <circle cx="850.0" cy="381.7" r="5" fill="#38bdf8"/>
+    <circle cx="850.0" cy="380.8" r="5" fill="#f43f5e"/>
+
+    <!-- Legend -->
+    <g transform="translate(580, 86)">
+        <rect width="250" height="52" fill="#0f172a" fill-opacity="0.85" rx="6" stroke="#475569" stroke-width="1"/>
+        <line x1="16" y1="18" x2="44" y2="18" stroke="#38bdf8" stroke-width="3"/>
+        <circle cx="30" cy="18" r="4" fill="#38bdf8"/>
+        <text x="52" y="22" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="12">Training Loss: 0.895</text>
+
+        <line x1="16" y1="36" x2="44" y2="36" stroke="#f43f5e" stroke-width="3"/>
+        <circle cx="30" cy="36" r="4" fill="#f43f5e"/>
+        <text x="52" y="40" fill="#f8fafc" font-family="system-ui, sans-serif" font-size="12">Validation Log-Loss: 0.898</text>
+    </g>
+</svg>
