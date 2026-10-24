@@ -2,582 +2,454 @@
  * RescuGuard AI — Emergency Response Prioritization Logic
  * INSA Cyber Talent Summer Camp 2026
  * -----------------------------------------------------------
- * Clean, emoji-free enterprise logic for geospatial mapping,
- * heatmap analysis, incident presets, and dispatch protocols.
+ * Clean, lightweight, enterprise JavaScript for real-time incident
+ * severity inference, dynamic probability distribution rendering,
+ * explainable risk factor attribution, and automated dispatch ticketing.
  */
 
 // Global State
-let map = null;
-let incidentMarker = null;
-let heatLayer = null;
-let corridorsLayerGroup = null;
-let hotspotsLayerGroup = null;
 let lastPredictionResult = null;
+let lastInputPayload = null;
 
-// Historical Accident Density Hotspots [lat, lng, intensity]
-const ACCIDENT_HEAT_POINTS = [
-    // Addis Ababa Ring Road & High-Density Urban Hotspots
-    [8.9897, 38.7523, 1.0],  // Gotera Interchange
-    [8.9880, 38.7510, 0.8],
-    [8.9910, 38.7540, 0.85],
-    [8.9610, 38.7615, 0.9],   // Saris Abo Junction
-    [8.9580, 38.7600, 0.75],
-    [8.9220, 38.7610, 0.95],  // Kality Roundabout & Truck Exit
-    [8.9200, 38.7590, 0.85],
-    [8.9950, 38.7880, 0.85],  // Bole Ring Road
-    [8.9980, 38.7910, 0.75],
-    [9.0205, 38.8020, 0.9],   // Megenagna Hub
-    [9.0230, 38.8050, 0.8],
-    [9.0190, 38.8250, 0.75],  // Gurad Shola
-    [9.0110, 38.7240, 0.85],  // Tor Hailoch
-    [9.0090, 38.7210, 0.75],
-    [8.9850, 38.7050, 0.8],   // Ayer Tena Roundabout
-    [9.0340, 38.7380, 0.9],   // Merkato Corridor
-    [9.0300, 38.7510, 0.75],  // Piassa Churchill Ave
-    [9.0108, 38.7616, 0.85],  // Meskel Square
-
-    // Addis–Djibouti Freight Logistics Artery
-    [8.8850, 38.7950, 0.85],  // Akaki Toll Gate
-    [8.7950, 38.9050, 0.8],   // Dukem Industrial Link
-    [8.7500, 38.9800, 0.9],   // Bishoftu Bypass
-    [8.5925, 39.1245, 1.0],   // Modjo Dry Port Freight Interchange
-    [8.5950, 39.1260, 0.9],
-    [8.5400, 39.2700, 0.9],   // Adama Expressway Exit
-    [8.6650, 39.4350, 0.75],  // Welenchiti Curve
-    [8.8950, 39.9150, 0.85],  // Metehara Transit
-    [9.0050, 40.1650, 0.95],  // Awash Arba Gorge
-    [10.1650, 40.6450, 0.8],  // Gewane Freight Sector
-    [11.4150, 40.7580, 0.9],  // Mille Junction
-    [11.7150, 41.8350, 0.85], // Galafi Border Crossing
-
-    // Entoto Pass Hazards
-    [9.0750, 38.7620, 0.9],   // Entoto Pass Base
-    [9.0820, 38.7620, 0.85],  // Hairpin Curve
-    [9.1050, 38.7580, 0.8],   // Sululta Transition
-
-    // US Benchmark
-    [39.8651, -84.0587, 0.95],
-    [39.8600, -84.0700, 0.85],
-    [39.8700, -84.0400, 0.9]
-];
-
-// High-Risk Route Corridors
-const ACCIDENT_CORRIDORS = [
-    {
-        name: "Addis Ababa Ring Road Belt",
-        color: "#f97316",
-        risk: "High Collision Density",
-        coords: [
-            [8.9850, 38.7050],
-            [9.0110, 38.7240],
-            [9.0340, 38.7380],
-            [9.0300, 38.7510],
-            [9.0108, 38.7616],
-            [8.9897, 38.7523],
-            [8.9610, 38.7615],
-            [8.9220, 38.7610],
-            [8.9950, 38.7880],
-            [9.0205, 38.8020],
-            [9.0190, 38.8250]
-        ]
+// Benchmark Scenarios Grounded on the US Accidents Kaggle Dataset
+const BENCHMARK_PRESETS = {
+    i95_fog: {
+        sector: "I-95 Northern Corridor (Freezing & Fog)",
+        lat: 41.8240,
+        lng: -71.4128,
+        temp_f: 28.0,
+        humidity: 94,
+        visibility: 0.8,
+        bump: false,
+        crossing: false,
+        traffic_signal: false,
+        weather: "Fog",
+        solar: "Night"
     },
-    {
-        name: "Addis–Djibouti Freight Corridor",
-        color: "#ef4444",
-        risk: "Critical Freight Route",
-        coords: [
-            [8.9220, 38.7610],
-            [8.8850, 38.7950],
-            [8.7950, 38.9050],
-            [8.7500, 38.9800],
-            [8.5925, 39.1245],
-            [8.5400, 39.2700],
-            [8.6650, 39.4350],
-            [8.8950, 39.9150],
-            [9.0050, 40.1650]
-        ]
+    i80_rain: {
+        sector: "I-80 Midwest Highway (Wet & Low Visibility)",
+        lat: 41.5868,
+        lng: -87.6847,
+        temp_f: 45.0,
+        humidity: 92,
+        visibility: 2.5,
+        bump: false,
+        crossing: true,
+        traffic_signal: false,
+        weather: "Heavy Rain",
+        solar: "Day"
     },
-    {
-        name: "Entoto Mountain Pass",
-        color: "#eab308",
-        risk: "Steep Grade & Fog Zone",
-        coords: [
-            [9.0300, 38.7510],
-            [9.0550, 38.7600],
-            [9.0750, 38.7620],
-            [9.0820, 38.7620],
-            [9.1100, 38.7550]
-        ]
-    }
-];
-
-// Presets
-const PRESETS = {
-    addis_gotera: {
-        sector: "Addis Ababa: Gotera Interchange",
-        lat: 8.9897,
-        lng: 38.7523,
-        temp_f: 66.0,
-        humidity: 68,
-        visibility: 9.0,
+    la_metro: {
+        sector: "LA Urban Arterial (Daylight Rush Hour)",
+        lat: 34.0522,
+        lng: -118.2437,
+        temp_f: 74.0,
+        humidity: 42,
+        visibility: 10.0,
         bump: false,
         crossing: true,
         traffic_signal: true,
         weather: "Clear",
         solar: "Day"
     },
-    modjo_corridor: {
-        sector: "Addis–Djibouti Corridor: Modjo Freight Route",
-        lat: 8.5925,
-        lng: 39.1245,
-        temp_f: 58.0,
-        humidity: 88,
-        visibility: 3.5,
+    texas_heat: {
+        sector: "Texas I-10 Freight Sector (Extreme Heat)",
+        lat: 29.7604,
+        lng: -95.3698,
+        temp_f: 99.0,
+        humidity: 65,
+        visibility: 10.0,
         bump: false,
         crossing: false,
         traffic_signal: false,
-        weather: "Rain",
-        solar: "Night"
-    },
-    bole_rain: {
-        sector: "Addis Ababa: Bole Ring Road",
-        lat: 8.9950,
-        lng: 38.7880,
-        temp_f: 61.0,
-        humidity: 94,
-        visibility: 2.2,
-        bump: false,
-        crossing: true,
-        traffic_signal: true,
-        weather: "Heavy Rain",
+        weather: "Clear",
         solar: "Day"
     },
-    entoto_fog: {
-        sector: "Entoto Mountain Pass",
-        lat: 9.0750,
-        lng: 38.7620,
-        temp_f: 46.5,
-        humidity: 98,
-        visibility: 0.6,
-        bump: true,
-        crossing: false,
-        traffic_signal: false,
-        weather: "Fog",
-        solar: "Night"
-    },
-    us_benchmark: {
-        sector: "US Highway Benchmark: Ohio I-70",
+    signal_crossing: {
+        sector: "Suburban Protected Intersection (Daylight)",
         lat: 39.8651,
         lng: -84.0587,
-        temp_f: 36.9,
-        humidity: 91,
-        visibility: 1.5,
+        temp_f: 65.0,
+        humidity: 50,
+        visibility: 10.0,
         bump: false,
         crossing: true,
         traffic_signal: true,
-        weather: "Fog",
+        weather: "Clear",
         solar: "Day"
     }
 };
 
-// Initialization
-document.addEventListener('DOMContentLoaded', () => {
-    initGeospatialMap();
-    initMapControls();
-    initPresetListeners();
-    initModalHandlers();
+document.addEventListener("DOMContentLoaded", () => {
+    initPresetButtons();
+    initDynamicFieldHints();
+    initFormSubmission();
+    initTicketModal();
     checkSystemHealth();
 });
 
-// Map Setup
-function initGeospatialMap() {
-    const defaultLat = parseFloat(document.getElementById('start_lat').value) || 8.9897;
-    const defaultLng = parseFloat(document.getElementById('start_lng').value) || 38.7523;
+/**
+ * Scenario Presets Controller
+ */
+function initPresetButtons() {
+    const buttons = document.querySelectorAll(".preset-btn");
 
-    map = L.map('incidentMap', {
-        zoomControl: true,
-        attributionControl: false
-    }).setView([defaultLat, defaultLng], 12);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19
-    }).addTo(map);
-
-    // Heatmap Layer
-    if (typeof L.heatLayer === 'function') {
-        heatLayer = L.heatLayer(ACCIDENT_HEAT_POINTS, {
-            radius: 22,
-            blur: 14,
-            maxZoom: 15,
-            minOpacity: 0.35,
-            gradient: {
-                0.2: '#38bdf8',
-                0.5: '#eab308',
-                0.8: '#f97316',
-                1.0: '#ef4444'
-            }
-        }).addTo(map);
-    }
-
-    corridorsLayerGroup = L.layerGroup().addTo(map);
-    hotspotsLayerGroup = L.layerGroup().addTo(map);
-
-    renderCorridors();
-    renderHotspotBadges();
-
-    // Incident Marker
-    incidentMarker = L.marker([defaultLat, defaultLng], {
-        draggable: true
-    }).addTo(map);
-
-    incidentMarker.on('dragend', () => {
-        const pos = incidentMarker.getLatLng();
-        updateCoordinateInputs(pos.lat, pos.lng);
-    });
-
-    map.on('click', (e) => {
-        incidentMarker.setLatLng(e.latlng);
-        updateCoordinateInputs(e.latlng.lat, e.latlng.lng);
-    });
-
-    document.getElementById('start_lat').addEventListener('change', syncInputsToMap);
-    document.getElementById('start_lng').addEventListener('change', syncInputsToMap);
-}
-
-function renderCorridors() {
-    ACCIDENT_CORRIDORS.forEach(corridor => {
-        const poly = L.polyline(corridor.coords, {
-            color: corridor.color,
-            weight: 3.5,
-            opacity: 0.85,
-            dashArray: '6, 4'
-        }).addTo(corridorsLayerGroup);
-
-        const tooltip = `<strong>${escapeHtml(corridor.name)}</strong><br><span style="color: ${corridor.color};">${corridor.risk}</span>`;
-        poly.bindTooltip(tooltip, { className: 'leaflet-tooltip-dark', sticky: true });
-
-        poly.on('click', (e) => {
-            incidentMarker.setLatLng(e.latlng);
-            updateCoordinateInputs(e.latlng.lat, e.latlng.lng);
-            document.getElementById('activeSectorLabel').innerText = corridor.name;
-        });
-    });
-}
-
-function renderHotspotBadges() {
-    const keyHotspots = [
-        { name: "Gotera Interchange", lat: 8.9897, lng: 38.7523, risk: "Critical Density" },
-        { name: "Modjo Dry Port Freight Junction", lat: 8.5925, lng: 39.1245, risk: "High Freight Hazard" },
-        { name: "Kality Industrial Interchange", lat: 8.9220, lng: 38.7610, risk: "Frequent Collisions" },
-        { name: "Entoto Mountain Hairpin", lat: 9.0820, lng: 38.7620, risk: "Fog / Steep Slope" }
-    ];
-
-    keyHotspots.forEach(spot => {
-        const marker = L.circleMarker([spot.lat, spot.lng], {
-            radius: 6,
-            fillColor: '#ef4444',
-            color: '#ffffff',
-            weight: 1.5,
-            fillOpacity: 0.9
-        }).addTo(hotspotsLayerGroup);
-
-        marker.bindTooltip(`<strong>${escapeHtml(spot.name)}</strong><br>${spot.risk}`, { className: 'leaflet-tooltip-dark' });
-
-        marker.on('click', (e) => {
-            L.DomEvent.stopPropagation(e);
-            incidentMarker.setLatLng([spot.lat, spot.lng]);
-            updateCoordinateInputs(spot.lat, spot.lng);
-            document.getElementById('activeSectorLabel').innerText = spot.name;
-        });
-    });
-}
-
-function initMapControls() {
-    const heatmapBtn = document.getElementById('toggleHeatmapBtn');
-    const corridorsBtn = document.getElementById('toggleCorridorsBtn');
-    const tileBtn = document.getElementById('toggleMapTileBtn');
-    const recenterBtn = document.getElementById('recenterMapBtn');
-    const mapElement = document.getElementById('incidentMap');
-
-    heatmapBtn.addEventListener('click', () => {
-        if (!heatLayer) return;
-        if (map.hasLayer(heatLayer)) {
-            map.removeLayer(heatLayer);
-            heatmapBtn.classList.remove('active');
-            heatmapBtn.innerText = 'Heatmap: Off';
-        } else {
-            map.addLayer(heatLayer);
-            heatmapBtn.classList.add('active');
-            heatmapBtn.innerText = 'Heatmap: On';
-        }
-    });
-
-    corridorsBtn.addEventListener('click', () => {
-        if (map.hasLayer(corridorsLayerGroup)) {
-            map.removeLayer(corridorsLayerGroup);
-            map.removeLayer(hotspotsLayerGroup);
-            corridorsBtn.classList.remove('active');
-            corridorsBtn.innerText = 'Corridors: Off';
-        } else {
-            map.addLayer(corridorsLayerGroup);
-            map.addLayer(hotspotsLayerGroup);
-            corridorsBtn.classList.add('active');
-            corridorsBtn.innerText = 'Corridors: On';
-        }
-    });
-
-    tileBtn.addEventListener('click', () => {
-        mapElement.classList.toggle('clean-osm');
-        const isClean = mapElement.classList.contains('clean-osm');
-        tileBtn.innerText = isClean ? 'Tile: Light' : 'Tile: Dark';
-        tileBtn.classList.toggle('active', isClean);
-    });
-
-    recenterBtn.addEventListener('click', () => {
-        map.flyTo([8.9897, 38.7523], 12, { duration: 0.8 });
-    });
-}
-
-function updateCoordinateInputs(lat, lng) {
-    document.getElementById('start_lat').value = lat.toFixed(4);
-    document.getElementById('start_lng').value = lng.toFixed(4);
-}
-
-function syncInputsToMap() {
-    const lat = parseFloat(document.getElementById('start_lat').value);
-    const lng = parseFloat(document.getElementById('start_lng').value);
-    if (!isNaN(lat) && !isNaN(lng) && map && incidentMarker) {
-        incidentMarker.setLatLng([lat, lng]);
-        map.panTo([lat, lng]);
-    }
-}
-
-// Preset Scenario Buttons
-function initPresetListeners() {
-    const buttons = document.querySelectorAll('.preset-btn');
     buttons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            buttons.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+        btn.addEventListener("click", () => {
+            buttons.forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
 
-            const presetKey = btn.getAttribute('data-preset');
-            const preset = PRESETS[presetKey];
-            if (!preset) return;
-
-            document.getElementById('start_lat').value = preset.lat;
-            document.getElementById('start_lng').value = preset.lng;
-            document.getElementById('temp_f').value = preset.temp_f;
-            document.getElementById('humidity').value = preset.humidity;
-            document.getElementById('visibility').value = preset.visibility;
-            document.getElementById('bump').checked = preset.bump;
-            document.getElementById('crossing').checked = preset.crossing;
-            document.getElementById('traffic_signal').checked = preset.traffic_signal;
-            document.getElementById('weather_condition').value = preset.weather;
-            document.getElementById('sunrise_sunset').value = preset.solar;
-
-            document.getElementById('activeSectorLabel').innerText = preset.sector;
-
-            if (map && incidentMarker) {
-                incidentMarker.setLatLng([preset.lat, preset.lng]);
-                map.flyTo([preset.lat, preset.lng], 13, { duration: 1.0 });
-            }
-
-            document.getElementById('accidentForm').dispatchEvent(new Event('submit'));
+            const presetKey = btn.getAttribute("data-preset");
+            applyPreset(presetKey);
         });
     });
 }
 
-// Health Check
-async function checkSystemHealth() {
-    const statusLabel = document.getElementById('systemStatus');
-    try {
-        const response = await fetch('/api/v1/health');
-        if (response.ok) {
-            const data = await response.json();
-            statusLabel.innerText = data.model_loaded ? 'Online' : 'Model Pending';
+function applyPreset(key) {
+    const data = BENCHMARK_PRESETS[key];
+    if (!data) return;
+
+    document.getElementById("start_lat").value = data.lat;
+    document.getElementById("start_lng").value = data.lng;
+    document.getElementById("temp_f").value = data.temp_f;
+    document.getElementById("humidity").value = data.humidity;
+    document.getElementById("visibility").value = data.visibility;
+
+    document.getElementById("bump").checked = data.bump;
+    document.getElementById("crossing").checked = data.crossing;
+    document.getElementById("traffic_signal").checked = data.traffic_signal;
+
+    document.getElementById("weather_condition").value = data.weather;
+    document.getElementById("sunrise_sunset").value = data.solar;
+
+    const sectorLabel = document.getElementById("activeSectorLabel");
+    if (sectorLabel) {
+        sectorLabel.textContent = `Scenario: ${data.sector}`;
+    }
+
+    updateDynamicFieldHints();
+}
+
+/**
+ * Live temperature & humidity hint updates
+ */
+function initDynamicFieldHints() {
+    const tempInput = document.getElementById("temp_f");
+    const humidityInput = document.getElementById("humidity");
+    const visibilityInput = document.getElementById("visibility");
+
+    if (tempInput) tempInput.addEventListener("input", updateDynamicFieldHints);
+    if (humidityInput) humidityInput.addEventListener("input", updateDynamicFieldHints);
+    if (visibilityInput) visibilityInput.addEventListener("input", updateDynamicFieldHints);
+
+    updateDynamicFieldHints();
+}
+
+function updateDynamicFieldHints() {
+    const tempVal = parseFloat(document.getElementById("temp_f")?.value);
+    const humVal = parseFloat(document.getElementById("humidity")?.value);
+    const visVal = parseFloat(document.getElementById("visibility")?.value);
+
+    // Temp Celsius
+    const tempHint = document.getElementById("tempCelsiusHint");
+    if (tempHint && !isNaN(tempVal)) {
+        const c = ((tempVal - 32) * 5 / 9).toFixed(1);
+        tempHint.textContent = `${c} °C`;
+        if (tempVal <= 32) {
+            tempHint.style.color = "#f43f5e";
+            tempHint.textContent = `${c} °C (Freezing)`;
+        } else if (tempVal >= 90) {
+            tempHint.style.color = "#f97316";
+            tempHint.textContent = `${c} °C (High Heat)`;
+        } else {
+            tempHint.style.color = "#38bdf8";
         }
-    } catch (err) {
-        statusLabel.innerText = 'Offline';
+    }
+
+    // Humidity status
+    const humHint = document.getElementById("humidityStatusHint");
+    if (humHint && !isNaN(humVal)) {
+        if (humVal >= 85) {
+            humHint.textContent = "High (Slip Risk)";
+            humHint.style.color = "#f97316";
+        } else if (humVal <= 30) {
+            humHint.textContent = "Low (Dry)";
+            humHint.style.color = "#94a3b8";
+        } else {
+            humHint.textContent = "Nominal";
+            humHint.style.color = "#10b981";
+        }
+    }
+
+    // Visibility status
+    const visHint = document.getElementById("visibilityStatusHint");
+    if (visHint && !isNaN(visVal)) {
+        if (visVal <= 2.0) {
+            visHint.textContent = "Severe Fog / Mist";
+            visHint.style.color = "#ef4444";
+        } else if (visVal <= 5.0) {
+            visHint.textContent = "Moderate Hazard";
+            visHint.style.color = "#eab308";
+        } else {
+            visHint.textContent = "Clear Visibility";
+            visHint.style.color = "#10b981";
+        }
     }
 }
 
-// Form Submit Handler
-document.getElementById('accidentForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
+/**
+ * Form Submission & Inference API Call
+ */
+function initFormSubmission() {
+    const form = document.getElementById("accidentForm");
+    if (!form) return;
 
-    const submitBtn = document.getElementById('submitBtn');
-    const originalText = submitBtn.innerText;
-    submitBtn.innerText = 'Evaluating Incident...';
-    submitBtn.disabled = true;
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        await executeSeverityAssessment();
+    });
 
+    // Keyboard shortcut: Ctrl + Enter
+    window.addEventListener("keydown", (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+            executeSeverityAssessment();
+        }
+    });
+}
+
+async function executeSeverityAssessment() {
+    const submitBtn = document.getElementById("submitBtn");
+    const btnSpinner = document.getElementById("btnSpinner");
+    const btnText = document.getElementById("btnText");
+
+    // Gather and validate input payload
     const payload = {
-        "Start_Lat": parseFloat(document.getElementById('start_lat').value),
-        "Start_Lng": parseFloat(document.getElementById('start_lng').value),
-        "Temperature(F)": parseFloat(document.getElementById('temp_f').value),
-        "Humidity(%)": parseFloat(document.getElementById('humidity').value),
-        "Visibility(mi)": parseFloat(document.getElementById('visibility').value),
-        "Bump": document.getElementById('bump').checked ? 1 : 0,
-        "Crossing": document.getElementById('crossing').checked ? 1 : 0,
-        "Traffic_Signal": document.getElementById('traffic_signal').checked ? 1 : 0,
-        "Weather_Condition": document.getElementById('weather_condition').value,
-        "Sunrise_Sunset": document.getElementById('sunrise_sunset').value,
+        "Start_Lat": parseFloat(document.getElementById("start_lat").value),
+        "Start_Lng": parseFloat(document.getElementById("start_lng").value),
+        "Temperature(F)": parseFloat(document.getElementById("temp_f").value),
+        "Humidity(%)": parseFloat(document.getElementById("humidity").value),
+        "Visibility(mi)": parseFloat(document.getElementById("visibility").value),
+        "Bump": document.getElementById("bump").checked ? 1 : 0,
+        "Crossing": document.getElementById("crossing").checked ? 1 : 0,
+        "Traffic_Signal": document.getElementById("traffic_signal").checked ? 1 : 0,
+        "Weather_Condition": document.getElementById("weather_condition").value,
+        "Sunrise_Sunset": document.getElementById("sunrise_sunset").value
     };
 
+    lastInputPayload = payload;
+
+    // UI Loading state
+    if (submitBtn) submitBtn.disabled = true;
+    if (btnSpinner) btnSpinner.classList.remove("hidden");
+    if (btnText) btnText.textContent = "Analyzing Incident Telemetry...";
+
     try {
-        const start = performance.now();
-        const response = await fetch('/api/v1/predict', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+        const response = await fetch("/api/v1/predict", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
             body: JSON.stringify(payload)
         });
 
         if (!response.ok) {
-            const err = await response.json();
-            throw new Error(err.detail || 'Inference failure.');
+            const errData = await response.json().catch(() => ({}));
+            throw new Error(errData.detail || `Server returned error status ${response.status}`);
         }
 
-        const data = await response.json();
-        const latency = (performance.now() - start).toFixed(1);
-
-        lastPredictionResult = {
-            ...data,
-            inputPayload: payload,
-            latency: latency,
-            timestamp: new Date().toISOString()
-        };
-
-        renderResults(data, latency);
-
+        const result = await response.json();
+        lastPredictionResult = result;
+        renderPredictionResult(result);
     } catch (err) {
-        alert('Assessment Error: ' + err.message);
+        console.error("Severity inference error:", err);
+        alert(`Assessment Error: ${err.message}`);
     } finally {
-        submitBtn.innerText = originalText;
-        submitBtn.disabled = false;
+        if (submitBtn) submitBtn.disabled = false;
+        if (btnSpinner) btnSpinner.classList.add("hidden");
+        if (btnText) btnText.textContent = "Evaluate Incident Severity & Dispatch";
     }
-});
+}
 
-// Render Results
-function renderResults(data, latency) {
-    document.getElementById('placeholder').classList.add('hidden');
-    const output = document.getElementById('resultContent');
-    output.classList.remove('hidden');
+/**
+ * Render Inference Results
+ */
+function renderPredictionResult(data) {
+    const placeholder = document.getElementById("placeholder");
+    const resultContent = document.getElementById("resultContent");
 
-    const banner = document.getElementById('priorityBanner');
-    banner.className = `triage-banner ${data.priority_level}`;
+    if (placeholder) placeholder.classList.add("hidden");
+    if (resultContent) resultContent.classList.remove("hidden");
 
-    const badge = document.getElementById('priorityBadge');
-    badge.innerText = data.priority_level;
-    badge.className = `priority-tag ${data.priority_level}`;
+    // Priority Banner
+    const priorityBanner = document.getElementById("priorityBanner");
+    const priorityBadge = document.getElementById("priorityBadge");
+    const severityTitle = document.getElementById("severityTitle");
+    const protocolText = document.getElementById("protocolText");
+    const latencyPill = document.getElementById("inferenceLatencyPill");
 
-    const latText = `${data.inference_time_ms ?? latency} ms`;
-    document.getElementById('inferenceLatencyPill').innerText = latText;
-    document.getElementById('telemetryLatency').innerText = latText;
+    const sev = data.predicted_severity || 2;
+    if (priorityBanner) {
+        priorityBanner.className = `triage-banner priority-level-${sev}`;
+    }
 
-    document.getElementById('severityTitle').innerText = data.severity_label;
-    document.getElementById('protocolText').innerText = data.response_protocol;
+    if (priorityBadge) {
+        priorityBadge.textContent = `${data.priority_level} PRIORITY`;
+    }
 
-    // Risk Factors
-    const riskContainer = document.getElementById('riskFactorsContainer');
-    riskContainer.innerHTML = '';
-    const risks = data.contributing_risk_factors || [];
+    if (severityTitle) {
+        severityTitle.textContent = data.severity_label;
+    }
 
-    if (risks.length === 0) {
-        riskContainer.innerHTML = '<div class="risk-tag neutral">Standard ambient conditions</div>';
-    } else {
-        risks.forEach(r => {
-            const el = document.createElement('div');
-            el.className = 'risk-tag';
-            el.innerText = r;
-            riskContainer.appendChild(el);
+    if (protocolText) {
+        protocolText.textContent = data.response_protocol;
+    }
+
+    if (latencyPill) {
+        latencyPill.textContent = `Inference: ${data.inference_time_ms} ms`;
+    }
+
+    // Risk Factor Chips
+    const riskContainer = document.getElementById("riskFactorsContainer");
+    if (riskContainer) {
+        riskContainer.innerHTML = "";
+        const factors = data.contributing_risk_factors || [];
+        factors.forEach(f => {
+            const tag = document.createElement("div");
+            tag.className = "risk-tag";
+            tag.textContent = f;
+            riskContainer.appendChild(tag);
         });
     }
 
-    // Dispatch Actions
-    const list = document.getElementById('dispatchList');
-    list.innerHTML = '';
-    data.dispatch_recommendation.forEach(item => {
-        const li = document.createElement('li');
-        li.innerText = item;
-        list.appendChild(li);
+    // Mandatory Action Directives
+    const dispatchList = document.getElementById("dispatchList");
+    if (dispatchList) {
+        dispatchList.innerHTML = "";
+        const actions = data.dispatch_recommendation || [];
+        actions.forEach(action => {
+            const li = document.createElement("li");
+            li.textContent = action;
+            dispatchList.appendChild(li);
+        });
+    }
+
+    // Probability Distribution Bars
+    const probContainer = document.getElementById("probabilityBars");
+    if (probContainer) {
+        probContainer.innerHTML = "";
+        const probs = data.probabilities || {};
+
+        Object.keys(probs).sort().forEach(key => {
+            const pVal = probs[key];
+            const pPct = (pVal * 100).toFixed(1);
+            const sevNum = key.replace(/[^0-9]/g, "") || "2";
+
+            const row = document.createElement("div");
+            row.className = "prob-row";
+            row.innerHTML = `
+                <div class="prob-labels">
+                    <span>${key}</span>
+                    <span class="mono">${pPct}%</span>
+                </div>
+                <div class="prob-track">
+                    <div class="prob-fill sev-${sevNum}" style="width: ${pPct}%"></div>
+                </div>
+            `;
+            probContainer.appendChild(row);
+        });
+    }
+}
+
+/**
+ * Official Incident Dispatch Ticket Modal
+ */
+function initTicketModal() {
+    const modal = document.getElementById("ticketModal");
+    const openBtn = document.getElementById("openTicketBtn");
+    const closeBtn = document.getElementById("closeTicketBtn");
+    const dismissBtn = document.getElementById("dismissTicketBtn");
+    const printBtn = document.getElementById("printTicketBtn");
+
+    if (openBtn) {
+        openBtn.addEventListener("click", () => {
+            if (!lastPredictionResult || !lastInputPayload) return;
+            populateTicketModal();
+            modal.classList.remove("hidden");
+        });
+    }
+
+    const closeModal = () => modal.classList.add("hidden");
+    if (closeBtn) closeBtn.addEventListener("click", closeModal);
+    if (dismissBtn) dismissBtn.addEventListener("click", closeModal);
+
+    modal.addEventListener("click", (e) => {
+        if (e.target === modal) closeModal();
     });
 
-    // Probability Bars
-    const bars = document.getElementById('probabilityBars');
-    bars.innerHTML = '';
-    Object.entries(data.probabilities).forEach(([cls, prob]) => {
-        const pct = (prob * 100).toFixed(1);
-        const row = document.createElement('div');
-        row.className = 'bar-row';
-        row.innerHTML = `
-            <span class="bar-name">${cls}</span>
-            <div class="bar-track">
-                <div class="bar-fill ${data.priority_level}" style="width: ${pct}%;"></div>
-            </div>
-            <span class="bar-val">${pct}%</span>
-        `;
-        bars.appendChild(row);
+    if (printBtn) {
+        printBtn.addEventListener("click", () => {
+            window.print();
+        });
+    }
+}
+
+function populateTicketModal() {
+    const refCode = "INC-" + Math.floor(100000 + Math.random() * 900000);
+    const now = new Date();
+    const timestampStr = now.toISOString().replace("T", " ").substring(0, 19) + " UTC";
+
+    document.getElementById("ticketRefCode").textContent = refCode;
+    document.getElementById("ticketTimestamp").textContent = timestampStr;
+    document.getElementById("ticketPriorityVal").textContent = 
+        `${lastPredictionResult.priority_level} (Level ${lastPredictionResult.predicted_severity})`;
+
+    document.getElementById("ticketCoordsVal").textContent = 
+        `Lat: ${lastInputPayload.Start_Lat.toFixed(4)}, Lng: ${lastInputPayload.Start_Lng.toFixed(4)}`;
+
+    document.getElementById("ticketProtocolVal").textContent = lastPredictionResult.response_protocol;
+
+    const unitsList = document.getElementById("ticketUnitsVal");
+    unitsList.innerHTML = "";
+    (lastPredictionResult.dispatch_recommendation || []).forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        unitsList.appendChild(li);
+    });
+
+    const risksList = document.getElementById("ticketRisksVal");
+    risksList.innerHTML = "";
+    (lastPredictionResult.contributing_risk_factors || []).forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        risksList.appendChild(li);
     });
 }
 
-// Dispatch Ticket Modal
-function initModalHandlers() {
-    const modal = document.getElementById('ticketModal');
-    const openBtn = document.getElementById('openTicketBtn');
-    const closeBtn = document.getElementById('closeTicketBtn');
-    const dismissBtn = document.getElementById('dismissTicketBtn');
-    const printBtn = document.getElementById('printTicketBtn');
+/**
+ * System Health Probe & Telemetry Ping
+ */
+async function checkSystemHealth() {
+    const statusText = document.getElementById("systemStatus");
+    const latencyTag = document.getElementById("telemetryLatency");
 
-    openBtn.addEventListener('click', () => {
-        if (!lastPredictionResult) return;
-        populateTicket(lastPredictionResult);
-        modal.classList.remove('hidden');
-    });
+    const t0 = performance.now();
+    try {
+        const res = await fetch("/api/v1/health");
+        const t1 = performance.now();
+        const ping = Math.round(t1 - t0);
 
-    const close = () => modal.classList.add('hidden');
-    closeBtn.addEventListener('click', close);
-    dismissBtn.addEventListener('click', close);
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) close();
-    });
-
-    printBtn.addEventListener('click', () => {
-        window.print();
-    });
-}
-
-function populateTicket(res) {
-    const rand = Math.floor(1000 + Math.random() * 9000);
-    document.getElementById('ticketRefCode').innerText = `INSA-RGA-${rand}`;
-    document.getElementById('ticketTimestamp').innerText = new Date().toLocaleString();
-    
-    document.getElementById('ticketPriorityVal').innerText = `${res.priority_level} (${res.severity_label})`;
-
-    const sector = document.getElementById('activeSectorLabel').innerText;
-    document.getElementById('ticketCoordsVal').innerText = 
-        `${res.inputPayload.Start_Lat.toFixed(4)} N, ${res.inputPayload.Start_Lng.toFixed(4)} E [${sector}]`;
-
-    document.getElementById('ticketProtocolVal').innerText = res.response_protocol;
-
-    const units = document.getElementById('ticketUnitsVal');
-    units.innerHTML = '';
-    res.dispatch_recommendation.forEach(u => {
-        const li = document.createElement('li');
-        li.innerText = u;
-        units.appendChild(li);
-    });
-
-    const risks = document.getElementById('ticketRisksVal');
-    risks.innerHTML = '';
-    (res.contributing_risk_factors || []).forEach(r => {
-        const li = document.createElement('li');
-        li.innerText = r;
-        risks.appendChild(li);
-    });
-}
-
-function escapeHtml(str) {
-    return str
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
+        if (res.ok) {
+            const data = await res.json();
+            if (statusText) {
+                statusText.textContent = data.model_loaded ? "Pipeline Online" : "Model Missing";
+            }
+            if (latencyTag) {
+                latencyTag.textContent = `${ping} ms`;
+            }
+        }
+    } catch {
+        if (statusText) statusText.textContent = "Offline";
+        if (latencyTag) latencyTag.textContent = "-- ms";
+    }
 }
