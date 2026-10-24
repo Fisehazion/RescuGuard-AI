@@ -34,6 +34,32 @@ def health_check() -> HealthResponse:
     )
 
 
+@router.get(
+    "/metrics",
+    status_code=status.HTTP_200_OK,
+    summary="Model Analytics & Loss Telemetry",
+    description="Returns precomputed evaluation metrics, loss convergence data, and feature importances grounded on real dataset records."
+)
+def get_model_metrics():
+    """
+    Returns the serialized evaluation metrics and loss dynamics.
+    """
+    metrics_file = settings.PROCESSED_DATA_DIR / "evaluation_metrics.json"
+    if not metrics_file.exists():
+        metrics_file = settings.PROCESSED_DATA_DIR / "metrics.json"
+    
+    if not metrics_file.exists():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Evaluation metrics not found. Run 'python compute_metrics_from_data.py' to generate."
+        )
+    
+    import json
+    with open(metrics_file, "r") as f:
+        data = json.load(f)
+    return data
+
+
 @router.post(
     "/predict",
     response_model=PredictionResponse,
