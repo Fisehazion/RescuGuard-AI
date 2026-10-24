@@ -37,12 +37,13 @@ Thumbs.db
 .env
 .env.local
 
-# Large Datasets & Trained Model Artifacts (exceed GitHub 100MB file limits)
+# Large Datasets & Raw Files (exceed GitHub 100MB file limits)
 data/raw/*.csv
 data/raw/*.parquet
 data/raw/*.zip
-data/processed/*.joblib
 data/processed/*.pkl
 data/processed/*.onnx
 !data/raw/.gitkeep
 !data/processed/.gitkeep
+!data/processed/model_pipeline.joblib
+
