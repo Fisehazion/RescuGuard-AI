@@ -1,11 +1,11 @@
 # RescuGuard AI — Emergency Dispatch &amp; Road Incident Severity Prediction System
 
-[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-rescuguard--ai.onrender.com-00c7b7?style=for-the-badge&logo=render&logoColor=white)](https://rescuguard-ai.onrender.com)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-rescuguard--ai.onrender.com-00c7b7?style=for-the-badge&logo=render&logoColor=white)](https://rescuguard-ai.onrender.com)
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://rescuguard-ai.onrender.com/docs)
 [![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 
-> 🌐 **Live Web Application:** [https://rescuguard-ai.onrender.com](https://rescuguard-ai.onrender.com)  
-> 📑 **Interactive API Swagger Docs:** [https://rescuguard-ai.onrender.com/docs](https://rescuguard-ai.onrender.com/docs)  
+> **Live Web Application:** [https://rescuguard-ai.onrender.com](https://rescuguard-ai.onrender.com)  
+> **Interactive API Swagger Docs:** [https://rescuguard-ai.onrender.com/docs](https://rescuguard-ai.onrender.com/docs)  
 > **INSA Cyber Talent Summer Camp 2026 — Final Project &amp; Submission**  
 > *A high-performance decision-support engine for real-time traffic accident severity triaging, explainable risk factor attribution (XAI), and automated emergency resource allocation.*  
 > **Developed by:** Fisehatsion Adisu (AASTU &bull; INSA Cyber Talent 2026)
